@@ -11,4 +11,4 @@ st.write('El número al cuadrado es:', x**2)
 
 
 
-var1 = st.sidebar.slider('Hola', 13, 78, 53)
+var1 = st.sidebar.slider('Hola', 13, 78, 10)
