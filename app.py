@@ -26,4 +26,4 @@ def card():
 
 st.write(card())
 
-var1 = st.sidebar.slider('Hola', 13, 78, 10)
+var1 = st.sidebar.slider('Hola', 13, 78, 50)
