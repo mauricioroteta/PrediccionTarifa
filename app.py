@@ -220,7 +220,7 @@ def main():
 
         predicciones = tree_mode.predict(X_apredecir)
 
-        st.info(f'La PrimaNeta calculada es de: $ {predicciones[0]}', icon="⚠️")
+        st.info(f'La PrimaNeta calculada es de: $ {predicciones[0]}')
 
 if __name__ == '__main__':
     main()
