@@ -5,6 +5,9 @@ import pandas as pd
 
 # Definir la interfaz de la aplicación
 def main():
+
+    st.sidebar.image('https://jobs.coderhouse.com/assets/logos_coderhouse.png' , use_column_width=True) 
+
     st.title('Predicción de Prima Neta')
 
     # Entrada de datos
@@ -25,11 +28,23 @@ def main():
     ldias_aseg = cargar_datos(nombre_archivo, 'Vigencia')
     lCoberturas = cargar_datos(nombre_archivo, 'Coberturas')
 
+
     # Mostrar datos en un selectbox
     Pol6TTaCod = st.sidebar.selectbox('Tarifa', ltarifas['Tarifas'], index=None, placeholder="Seleccione una Tarifa")
-    capitulo = st.sidebar.number_input('Capitulo', value=1)
-    var_rc = st.sidebar.number_input('VarRC', value=1)
-    var_air = st.sidebar.number_input('VarAIR', value=1)
+
+    # Dividir la barra lateral en tres columnas
+    columna1, columna2, columna3 = st.sidebar.columns(3)
+
+    # Widget number_input en cada columna
+    with columna1:
+        capitulo = st.number_input('Capitulo', value=1)
+
+    with columna2:
+        var_rc = st.number_input('VarRC', value=1)
+
+    with columna3:
+        var_air = st.number_input('VarAIR', value=1)
+
     modelo = st.sidebar.number_input('modelo', value=2010)
     dias_aseg = st.sidebar.selectbox('Vigencia', ldias_aseg['Vigencia'], index=None, placeholder="Seleccione una Vigencia")
     suma_aseg = st.sidebar.number_input('SumaAseg', value=6259000)
