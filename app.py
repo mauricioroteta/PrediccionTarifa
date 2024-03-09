@@ -3,56 +3,6 @@ import joblib
 import pandas as pd
 
 
-
-def a_dummies(df_apredecir):
-  # Dummies para coberturas
-  dummy_columns = {
-      'Cobertura': {
-          'prefix': 'COB',
-          'sep': ';'
-      }
-  }
-  for column_name, dummy_data in dummy_columns.items():
-      dummies = df_apredecir[column_name].str.get_dummies(sep=dummy_data['sep'])
-
-      dummies.columns = map(lambda col: f'{dummy_data["prefix"]}_{col}', dummies.columns)
-
-      df_apredecir = pd.concat([df_apredecir, dummies], axis=1)
-
-  df_apredecir = df_apredecir.drop(columns=dummy_columns.keys())
-  # Dummies para Tarifa
-  dummy_columns = {
-      'Pol6TTaCod': {
-          'prefix': 'TAR',
-          'sep': ';'
-      }
-  }
-  for column_name, dummy_data in dummy_columns.items():
-      dummies = df_apredecir[column_name].str.get_dummies(sep=dummy_data['sep'])
-
-      dummies.columns = map(lambda col: f'{dummy_data["prefix"]}_{col}', dummies.columns)
-
-      df_apredecir = pd.concat([df_apredecir, dummies], axis=1)
-
-  df_apredecir = df_apredecir.drop(columns=dummy_columns.keys())
-  # Dummies para UNEG
-  dummy_columns = {
-      'UNEG': {
-          'prefix': 'UNEG',
-          'sep': ';'
-      }
-  }
-
-  for column_name, dummy_data in dummy_columns.items():
-      dummies = df_apredecir[column_name].str.get_dummies(sep=dummy_data['sep'])
-
-      dummies.columns = map(lambda col: f'{dummy_data["prefix"]}_{col}', dummies.columns)
-
-      df_apredecir = pd.concat([df_apredecir, dummies], axis=1)
-
-  df_apredecir = df_apredecir.drop(columns=dummy_columns.keys())
-
-
 # Definir la interfaz de la aplicación
 def main():
     st.title('Predicción de Prima Neta')
@@ -80,13 +30,13 @@ def main():
     capitulo = st.sidebar.number_input('Capitulo', value=1)
     var_rc = st.sidebar.number_input('VarRC', value=1)
     var_air = st.sidebar.number_input('VarAIR', value=1)
-    modelo = st.sidebar.number_input('modelo', value=2014)
+    modelo = st.sidebar.number_input('modelo', value=2010)
     dias_aseg = st.sidebar.selectbox('Vigencia', ldias_aseg['Vigencia'], index=None, placeholder="Seleccione una Vigencia")
-    suma_aseg = st.sidebar.number_input('SumaAseg', value=8000000)
+    suma_aseg = st.sidebar.number_input('SumaAseg', value=6259000)
     Cobertura = st.sidebar.selectbox('Cobertura', lCoberturas['Coberturas'], index=None, placeholder="Seleccione una Cobertura")
     bonif = st.sidebar.number_input('Bonif', value=0.0)
     aa = st.sidebar.number_input('AA', value=0)
-    PrimaRC = st.sidebar.number_input('PrimaRC', value=9730.86)
+    PrimaRC = st.sidebar.number_input('PrimaRC', value=10814.18)
     UNEG = st.sidebar.selectbox('Unidad de Negocios', lUNEG['UNEG'], index=None, placeholder="Seleccione una Unidad de Negocios")
 
     # Botón para predecir
@@ -101,9 +51,9 @@ def main():
             'SumaAseg': [suma_aseg],
             'Cobertura': [Cobertura],
             'Bonif': [bonif],
-            'PrimaRC':[PrimaRC],
+            'PrimaRC': [PrimaRC],
             'AA': [aa],
-            'UNEG':[UNEG]
+            'UNEG': [UNEG]
         }
         
         # Cargar el modelo
@@ -194,12 +144,60 @@ def main():
         # Convertir el diccionario en un DataFrame
         df = pd.DataFrame(data)
 
-        tree_mode = joblib.load('ModeloTarifa.pkl')
+        model = joblib.load('RF_ModeloTarifa.pkl')
 
         df_apredecir = pd.DataFrame(data_apredecir)
 
-        # Llama a procedimiento para generar dummies
-        d = a_dummies(df_apredecir)
+        # Dummies para coberturas
+        dummy_columns = {
+            'Cobertura': {
+                'prefix': 'COB',
+                'sep': ';'
+            }
+        }
+
+        for column_name, dummy_data in dummy_columns.items():
+            dummies = df_apredecir[column_name].str.get_dummies(sep=dummy_data['sep'])
+
+            dummies.columns = map(lambda col: f'{dummy_data["prefix"]}_{col}', dummies.columns)
+
+            df_apredecir = pd.concat([df_apredecir, dummies], axis=1)
+
+        df_apredecir = df_apredecir.drop(columns=dummy_columns.keys())
+
+        # Dummies para Tarifa
+        dummy_columns = {
+            'Pol6TTaCod': {
+                'prefix': 'TAR',
+                'sep': ';'
+            }
+        }
+
+        for column_name, dummy_data in dummy_columns.items():
+            dummies = df_apredecir[column_name].str.get_dummies(sep=dummy_data['sep'])
+
+            dummies.columns = map(lambda col: f'{dummy_data["prefix"]}_{col}', dummies.columns)
+
+            df_apredecir = pd.concat([df_apredecir, dummies], axis=1)
+
+        df_apredecir = df_apredecir.drop(columns=dummy_columns.keys())
+
+        # Dummies para UNEG
+        dummy_columns = {
+            'UNEG': {
+                'prefix': 'UNEG',
+                'sep': ';'
+            }
+        }
+
+        for column_name, dummy_data in dummy_columns.items():
+            dummies = df_apredecir[column_name].str.get_dummies(sep=dummy_data['sep'])
+
+            dummies.columns = map(lambda col: f'{dummy_data["prefix"]}_{col}', dummies.columns)
+
+            df_apredecir = pd.concat([df_apredecir, dummies], axis=1)
+
+        df_apredecir = df_apredecir.drop(columns=dummy_columns.keys())
 
         # Crear un DataFrame vacío con la misma estructura que A ----------------------------------------------------
         df_final = pd.DataFrame(columns=df.columns)
@@ -218,9 +216,9 @@ def main():
         # y que deseas predecir la variable 'PrimaNeta'
         X_apredecir = C[['Capitulo',	'VarRC',	'VarAIR',	'modelo',	'diasAseg',	'SumaAseg',	'Bonif',	'AA',	'PrimaRC',	'COB_A',	'COB_A2',	'COB_B',	'COB_B1',	'COB_B3',	'COB_C',	'COB_C1',	'COB_C1+',	'COB_C2',	'COB_C3',	'COB_D1%',	'COB_D2',	'COB_D2%',	'COB_D2I',	'COB_D3',	'COB_D3%',	'COB_D32',	'COB_D36',	'COB_D3I',	'COB_D4%',	'COB_D4I',	'COB_D5%',	'COB_D54',	'COB_D6',	'COB_D6%',	'TAR_01',	'TAR_01_21',	'TAR_01_CPLUS',	'TAR_02',	'TAR_02_21',	'TAR_02_CPLUS',	'TAR_02_FOODT',	'TAR_03',	'TAR_03_21',	'TAR_03_CPLUS',	'TAR_04',	'TAR_04_21',	'TAR_04_CPLUS',	'TAR_05',	'TAR_05_21',	'TAR_05_CPLUS',	'TAR_06',	'TAR_06_21',	'TAR_06_CPLUS',	'TAR_07',	'TAR_07_21',	'TAR_07_CPLUS',	'TAR_08',	'TAR_08_21',	'TAR_08_CPLUS',	'TAR_09',	'TAR_09_21',	'TAR_09_CPLUS',	'TAR_13',	'TAR_13_21',	'TAR_13_CPLUS',	'TAR_15',	'TAR_15_21',	'TAR_15_CPLUS',	'TAR_16_CPLUS',	'TAR_18',	'TAR_18_21',	'TAR_19',	'TAR_19_CPLUS',	'TAR_23',	'TAR_23_21',	'TAR_23_CPLUS', 'UNEG_BA', 'UNEG_IN', 'UNEG_CB']]
 
-        predicciones = tree_mode.predict(X_apredecir)
-
-        st.info(f'La PrimaNeta calculada es de: $ {predicciones[0]}')
+        predicciones = model.predict(X_apredecir)
+        
+        st.info(f'La PrimaNeta calculada es de: $ {round(predicciones[0], 2)}')
 
 if __name__ == '__main__':
     main()

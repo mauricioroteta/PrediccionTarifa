@@ -13,6 +13,11 @@ https://predicciontarifa-mauricioroteta.streamlit.app/
 
 
 ----
+Exportar repo
+
 git add  --all
 git commit -m "Base final"
 git push -u  https://github.com/mauricioroteta/PrediccionTarifa
+
+traer repo
+git pull https://github.com/mauricioroteta/PrediccionTarifa main
